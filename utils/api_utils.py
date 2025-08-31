@@ -1,4 +1,23 @@
+import pandas as pd
 import requests
+
+
+def valid_city(check_city):
+    """
+    Check if a city is valid from the weathercity db.
+    
+    Parameters
+    ----------
+    check_city : str
+        The city to check.
+    
+    Returns
+    -------
+    bool
+        True if the city exists, False otherwise.
+    """
+    df = pd.read_csv('data/worldcities.csv')
+    return check_city.lower() in list(map(str.lower, df['city'].to_numpy()))
 
 def get_weather_from_city(city, api_key, metric):
     """
