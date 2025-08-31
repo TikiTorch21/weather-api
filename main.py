@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from pathlib import Path
 from utils.api_utils import get_weather_from_city
-from config.py import API_KEY
+from config import API_KEY
 
 st.title('Weather API')
 
@@ -23,7 +23,7 @@ metric_dict = {
 metric = metric_dict.get(unit)
 
 try: 
-    weather_dict = get_weather_from_city(city=city, api_key=api_key, metric=metric)
+    weather_dict = get_weather_from_city(city=city, api_key=API_KEY, metric=metric)
     with st.expander("🌡️ Temperature Info"):
         st.write(f"Current: {weather_dict['temp']}°")
         st.write(f"Feels like: {weather_dict['feels_like']}°")
