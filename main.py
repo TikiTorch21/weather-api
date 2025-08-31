@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 ACCENT = "#4F46E5"   # indigo-600
-BG = "#0B0B0C"       # near-black
+BG_DEFAULT = "#0B0B0C"
 CARD = "#121214"     # dark card
 MUTED = "#9CA3AF"    # gray-400
 OK_BADGE = "#10B981" # green-500
@@ -32,7 +32,11 @@ st.markdown(
     f"""
     <style>
       html, body, [class*="stApp"] {{
-        background: linear-gradient(180deg, {BG} 0%, #0E0E12 100%) !important;
+          background: linear-gradient(
+        180deg,
+        var(--bg-top, #0B0B0C) 0%,
+        var(--bg-bottom, #0E0E12) 100%
+        ) !important;
         color: #E5E7EB;
         font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, system-ui;
       }}
@@ -143,6 +147,32 @@ if (search or city) and city.strip():
     else:
         try:
             data = get_weather_from_city(city=city_str, api_key=API_KEY, metric=metric)
+            # Map OpenWeather icon families to colors
+            bg_top = {
+                "01": "#0B1120",  # clear
+                "02": "#0E1424",  # few clouds
+                "03": "#0E1626",  # scattered clouds
+                "04": "#0A0E16",  # overcast
+                "09": "#0A0F18",  # shower rain
+                "10": "#0A0F1B",  # rain
+                "11": "#090A12",  # thunderstorm
+                "13": "#0E1726",  # snow
+                "50": "#111827",  # mist/haze
+            }.get(data.get("icon","")[:2], "#0B0B0C")
+
+            # Slightly darker at night
+            if str(data.get("icon","")).endswith("n"):
+                bg_top = "#0A0B0E"
+
+            bg_bottom = "#0E0E12"  # keep a consistent bottom gradient
+
+            # Update CSS variables so the earlier rule picks them up
+            st.markdown(
+                f"<style>:root{{--bg-top:{bg_top};--bg-bottom:{bg_bottom};}}</style>",
+                unsafe_allow_html=True,
+            )
+
+
             fcst = get_forecast_from_city(city=city_str, api_key=API_KEY, metric=metric)
 
             # --- Current Conditions Card ---
